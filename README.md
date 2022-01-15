@@ -1,15 +1,6 @@
-# Basic Sample Hardhat Project
+# NFT-Marketplace
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+This project contains 2 smart contract, NFT.sol to mint NFT's and NFTMarket.sol to create sales and to fetch all items created to sale
+and also to fetch my NFT's.
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+The project was developed with hardhat and react/nextjs.
