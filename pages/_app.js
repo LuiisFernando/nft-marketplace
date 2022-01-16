@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import Menu from '../components/Menu';
 
 import { Web3ReactProvider } from '@web3-react/core';
-import MetamaskProvider from '../utils/MetaMaskProvider';
+import Web3ReactManager from '../utils/Web3ReactManager';
 
 function getLibrary(provider) {
   return new Web3(provider)
@@ -14,10 +14,10 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
-      <MetamaskProvider>
+      <Web3ReactManager>
         <Menu />
         <Component {...pageProps} />
-      </MetamaskProvider>
+      </Web3ReactManager>
     </Web3ReactProvider>
   )
 }

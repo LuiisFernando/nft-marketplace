@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import axios from 'axios';
 import Web3Modal from 'web3modal';
-import Web3 from 'web3';
+import useWeb3 from '../hooks/useWeb3';
 
 import {
   nftaddress, nftmarketadress
@@ -14,34 +14,39 @@ import Market from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json';
 export default function Home() {
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState('not-loaded');
-  const web3 = new Web3('ws://localhost:8545');
+  const web3 = useWeb3();
+
 
   async function loadNFTs() {
     const tokenContract = new web3.eth.Contract(NFT.abi, nftaddress);
     const marketContract = new web3.eth.Contract(Market.abi, nftmarketadress);
 
-    const data = await marketContract.methods.fetchMarketItems().call();
-    const items = await Promise.all(data.map(async i => {
+    try {
+      const data = await marketContract.methods.fetchMarketItems().call();
+      const items = await Promise.all(data.map(async i => {
 
-      const tokenUri = await tokenContract.methods.tokenURI(i.tokenId).call();
+        const tokenUri = await tokenContract.methods.tokenURI(i.tokenId).call();
 
-      const meta = await axios.get(tokenUri);
-      let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
+        const meta = await axios.get(tokenUri);
+        let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
 
-      let item = {
-        price: price,
-        tokenId: Number(i.tokenId),
-        seller: i.seller,
-        owner: i.owner,
-        image: meta.data.image,
-        name: meta.data.name,
-        description: meta.data.descrption
-      };
-      return item;
-    }));
+        let item = {
+          price: price,
+          tokenId: Number(i.tokenId),
+          seller: i.seller,
+          owner: i.owner,
+          image: meta.data.image,
+          name: meta.data.name,
+          description: meta.data.descrption
+        };
+        return item;
+      }));
 
-    setNfts(items);
-    setLoadingState('loaded');
+      setNfts(items);
+      setLoadingState('loaded');
+    } catch (err) {
+      console.log('erro ', err.message)
+    }
   }
 
   useEffect(() => {
