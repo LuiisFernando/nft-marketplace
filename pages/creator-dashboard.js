@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import axios from 'axios';
 import Web3Modal from 'web3modal';
+import { useWeb3React } from "@web3-react/core"
 
 import { nftaddress, nftmarketadress } from '../config';
 
@@ -12,6 +13,8 @@ export default function CreatorDashboard() {
     const [nfts, setNfts] = useState([]);
     const [sold, setSold] = useState([]);
     const [loadingState, setLoadingState] = useState('not-loaded');
+
+    const { active, account } = useWeb3React();
 
     async function loadNfts() {
         const web3Modal = new Web3Modal();
@@ -47,8 +50,9 @@ export default function CreatorDashboard() {
     }
 
     useEffect(() => {
-        loadNfts();
-    }, []);
+        if (active)
+            loadNfts();
+    }, [active, account]);
 
     return (
         <div className='flex justify-center'>

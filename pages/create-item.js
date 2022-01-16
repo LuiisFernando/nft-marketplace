@@ -45,7 +45,6 @@ export default function CreateItem() {
         try {
             const added = await client.add(data);
             const url = `https://ipfs.infura.io/ipfs/${added.path}`
-            debugger
             createSale(url)
 
         } catch (error) {

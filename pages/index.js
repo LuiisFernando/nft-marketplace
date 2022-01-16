@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import axios from 'axios';
 import Web3Modal from 'web3modal';
+import Web3 from 'web3';
 
 import {
   nftaddress, nftmarketadress
@@ -13,22 +14,23 @@ import Market from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json';
 export default function Home() {
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState('not-loaded');
+  const web3 = new Web3('ws://localhost:8545');
 
   async function loadNFTs() {
-    const provider = new ethers.providers.JsonRpcProvider();
-    const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider);
-    const marketContract = new ethers.Contract(nftmarketadress, Market.abi, provider);
+    const tokenContract = new web3.eth.Contract(NFT.abi, nftaddress);
+    const marketContract = new web3.eth.Contract(Market.abi, nftmarketadress);
 
-    const data = await marketContract.fetchMarketItems();
+    const data = await marketContract.methods.fetchMarketItems().call();
     const items = await Promise.all(data.map(async i => {
 
-      const tokenUri = await tokenContract.tokenURI(i.tokenId);
+      const tokenUri = await tokenContract.methods.tokenURI(i.tokenId).call();
+
       const meta = await axios.get(tokenUri);
       let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
 
       let item = {
         price: price,
-        tokenId: i.tokenId.toNumber(),
+        tokenId: Number(i.tokenId),
         seller: i.seller,
         owner: i.owner,
         image: meta.data.image,
@@ -45,6 +47,7 @@ export default function Home() {
   useEffect(() => {
     loadNFTs();
   }, []);
+
 
   async function buyNft(nft) {
     const web3Modal = new Web3Modal();

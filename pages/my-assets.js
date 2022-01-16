@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import axios from 'axios';
 import Web3Modal from 'web3modal';
+import { useWeb3React } from "@web3-react/core"
 
 import { nftaddress, nftmarketadress } from '../config';
 
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
 import Market from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json';
 
-
 export default function MyAssets() {
     const [nfts, setNfts] = useState([]);
     const [loadingState, setLoadingState] = useState('not-loaded');
+    const { active, account } = useWeb3React();
 
     async function loadNfts() {
         const web3Modal = new Web3Modal();
@@ -41,8 +42,9 @@ export default function MyAssets() {
     }
 
     useEffect(() => {
-        loadNfts();
-    }, []);
+        if (active)
+            loadNfts();
+    }, [active, account]);
 
     if (loadingState === 'loaded' && !nfts.length) {
         return (
